@@ -20,6 +20,7 @@
 namespace FacturaScripts\Core;
 
 use FacturaScripts\Core\Base\ControllerPermissions;
+use FacturaScripts\Core\Lib\MultiRequestProtection;
 use FacturaScripts\Core\Model\User;
 use FacturaScripts\Dinamic\Model\User as DinUser;
 
@@ -35,6 +36,36 @@ final class Session
     public static function clear(): void
     {
         self::$data = [];
+    }
+
+    public static function formToken(bool $userSpecific = false): string
+    {
+        $protection = new MultiRequestProtection();
+        if ($userSpecific) {
+            $user = self::user();
+            if (!empty($user->nick)) {
+                $protection->addSeed($user->nick);
+            }
+        }
+        return $protection->newToken();
+    }
+
+    public static function validateFormToken(string $token, bool $userSpecific = false): bool
+    {
+        if (empty($token)) {
+            return false;
+        }
+        $protection = new MultiRequestProtection();
+        if ($userSpecific) {
+            $user = self::user();
+            if (!empty($user->nick)) {
+                $protection->addSeed($user->nick);
+            }
+        }
+        if (false === $protection->validate($token)) {
+            return false;
+        }
+        return false === $protection->tokenExist($token);
     }
 
     public static function get(string $key)

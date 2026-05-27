@@ -99,9 +99,10 @@ class MultiRequestProtection
         }
 
         // check all valid tokens roots
+        $maxAge = Tools::config('form_token_expire', self::MAX_TOKEN_AGE);
         $num = intval(date('YmdH')) + strlen(self::$seed);
         $valid = [sha1(self::$seed . $num)];
-        for ($hour = 1; $hour <= self::MAX_TOKEN_AGE; $hour++) {
+        for ($hour = 1; $hour <= $maxAge; $hour++) {
             $time = strtotime('-' . $hour . ' hours');
             $altNum = intval(date('YmdH', $time)) + strlen(self::$seed);
             $valid[] = sha1(self::$seed . $altNum);

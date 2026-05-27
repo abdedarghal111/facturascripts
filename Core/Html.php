@@ -164,10 +164,10 @@ final class Html
         return new TwigFunction(
             'formToken',
             function (bool $input = true) {
-                $tokenClass = new MultiRequestProtection();
+                $token = Session::formToken();
                 return $input ?
-                    '<input type="hidden" name="multireqtoken" value="' . $tokenClass->newToken() . '"/>' :
-                    $tokenClass->newToken();
+                    '<input type="hidden" name="multireqtoken" value="' . $token . '"/>' :
+                    $token;
             },
             [
                 'is_safe' => ['html'],
